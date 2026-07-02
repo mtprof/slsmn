@@ -1,0 +1,6 @@
+{
+  "name": "Digital Salesman Prototype",
+  "description": "A live-voice interactive prototype of an AI digital salesman powered by Gemini Flash Live, dynamically tailoring sales strategies to the customer's psychology.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
