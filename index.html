@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Salesman Prototype</title>
+    <title>AI Salesman</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,317 +28,239 @@
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-      /* Smooth transitions */
       .fade-transition {
-        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      /* Custom elegant scrollbar */
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #262626;
+        border-radius: 2px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #404040;
       }
     </style>
   </head>
-  <body class="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between font-sans selection:bg-indigo-500/30 selection:text-white relative overflow-hidden">
+  <body class="min-h-screen bg-black text-neutral-100 flex flex-col justify-between font-sans selection:bg-neutral-800 selection:text-white relative overflow-hidden antialiased">
     
-    <!-- Background ambient lighting effects -->
-    <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-900/10 blur-[150px] pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-emerald-900/10 blur-[130px] pointer-events-none"></div>
-
     <!-- Confetti canvas for victory deals -->
     <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none z-50"></canvas>
 
-    <!-- Modern minimal header -->
-    <header class="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md px-6 py-4 flex items-center justify-between relative z-10">
-      <div class="flex items-center gap-3">
-        <div class="relative">
-          <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
-          </div>
-          <!-- Active Pulsing Call Dot -->
-          <div id="header-pulse" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full animate-pulse"></div>
-        </div>
-        <div>
-          <h1 class="text-base font-display font-semibold tracking-tight text-white leading-none">
-            AI Salesman
-          </h1>
-          <span class="text-[10px] font-mono text-slate-500 tracking-wider uppercase">
-            Gemini 2.0 Live Prototype
-          </span>
-        </div>
+    <!-- Sleek Minimal Header -->
+    <header class="px-8 py-6 flex items-center justify-between relative z-10 max-w-5xl mx-auto w-full">
+      <div class="flex items-center gap-2.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <h1 class="text-xs font-mono uppercase tracking-widest text-neutral-400 font-medium">
+          AI Salesman Live
+        </h1>
       </div>
 
-      <!-- Real-time Call Speaker Badge (Hidden on Idle) -->
-      <div id="speaker-badge" class="flex items-center gap-2 px-3 py-1 bg-slate-900 rounded-full border border-slate-800">
-        <span id="active-speaker-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
-        <span id="active-speaker-text" class="text-xs font-mono text-slate-400">Silent</span>
+      <!-- Real-time Call Speaker Badge -->
+      <div id="speaker-badge" class="flex items-center gap-2">
+        <span id="active-speaker-dot" class="w-1.5 h-1.5 rounded-full bg-neutral-800"></span>
+        <span id="active-speaker-text" class="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Silent</span>
       </div>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-8 flex flex-col justify-center items-center relative z-10">
+    <!-- Main Content Stage -->
+    <main class="flex-1 w-full max-w-4xl mx-auto px-6 py-4 flex flex-col justify-center items-center relative z-10">
       
       <!-- STATE 1: IDLE CONFIGURATION FORM -->
-      <div id="screen-idle" class="fade-transition w-full max-w-xl bg-slate-900/60 border border-slate-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl relative">
-        <div class="mb-6 text-center">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-3">
-            <i data-lucide="flame" class="w-3.5 h-3.5 text-indigo-400"></i>
-            <span class="text-[10px] font-mono text-indigo-300 font-medium uppercase tracking-wider">
-              World's Best Persuasion Prototype
-            </span>
-          </div>
-          <h2 class="text-2xl font-display font-semibold tracking-tight text-white">
-            Meet Your Digital Salesman
+      <div id="screen-idle" class="fade-transition w-full max-w-md bg-neutral-950 border border-neutral-900 p-8 rounded-2xl relative shadow-2xl">
+        <div class="mb-8">
+          <h2 class="text-xl font-display font-medium tracking-tight text-white">
+            Configure Negotiation
           </h2>
-          <p class="text-sm text-slate-400 mt-2 max-w-md mx-auto">
-            Provide your Gemini API key and define the product. He will dynamically analyze your voice, mood, and style to persuade you to buy.
-          </p>
         </div>
 
-        <div class="space-y-5">
+        <div class="space-y-6">
           <!-- Field 1: API Key -->
           <div>
-            <label for="input-api-key" class="block text-xs font-mono font-medium text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <i data-lucide="key" class="w-3.5 h-3.5 text-slate-500"></i>
+            <label for="input-api-key" class="block text-[10px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
               Gemini API Key
             </label>
             <input
               id="input-api-key"
               type="password"
-              placeholder="AI Studio API Key (AIzaSy...)"
-              class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl focus:border-indigo-500 focus:outline-none text-slate-100 placeholder-slate-600 text-sm transition-all"
+              placeholder="Paste key (AIzaSy...)"
+              class="w-full px-4 py-3 bg-neutral-900/60 border border-neutral-850 rounded-lg focus:border-neutral-500 focus:outline-none text-white placeholder-neutral-600 text-sm transition-all"
             />
-            <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
-              Used 100% client-side in your browser to establish connection. Never sent to any external server. Free-tier compatible.
-            </p>
           </div>
 
           <!-- Field 2: Product Name -->
           <div>
-            <label for="input-product" class="block text-xs font-mono font-medium text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <i data-lucide="tag" class="w-3.5 h-3.5 text-slate-500"></i>
+            <label for="input-product" class="block text-[10px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
               Product to Sell
             </label>
             <input
               id="input-product"
               type="text"
               placeholder="e.g. Porsche 911"
-              class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl focus:border-indigo-500 focus:outline-none text-slate-100 placeholder-slate-600 text-sm transition-all font-medium"
+              class="w-full px-4 py-3 bg-neutral-900/60 border border-neutral-850 rounded-lg focus:border-neutral-500 focus:outline-none text-white placeholder-neutral-600 text-sm transition-all font-medium"
             />
-            <p class="text-[10px] text-slate-500 mt-1.5">
-              The item this dynamic AI psychologist salesman must focus on selling you.
-            </p>
-          </div>
-
-          <!-- Field 3: Voice Selection -->
-          <div>
-            <label for="select-voice" class="block text-xs font-mono font-medium text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <i data-lucide="volume2" class="w-3.5 h-3.5 text-slate-500"></i>
-              Salesman Character Voice
-            </label>
-            <select
-              id="select-voice"
-              class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl focus:border-indigo-500 focus:outline-none text-slate-300 text-sm transition-all"
-            >
-              <option value="Zephyr">Zephyr &mdash; Warm, enthusiastic & high-rapport (Default)</option>
-              <option value="Aoede">Aoede &mdash; Sophisticated, clear & highly polished</option>
-              <option value="Puck">Puck &mdash; Bold, charismatic & energetic</option>
-              <option value="Charon">Charon &mdash; Authoritative, elite & exclusive</option>
-              <option value="Kore">Kore &mdash; Calm, consultative & professional</option>
-            </select>
-          </div>
-
-          <!-- Remember local option -->
-          <div class="flex items-center gap-2 pt-2">
-            <input
-              id="checkbox-remember"
-              type="checkbox"
-              class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 w-4 h-4 cursor-pointer"
-            />
-            <label for="checkbox-remember" class="text-xs text-slate-400 cursor-pointer select-none">
-              Remember API key & product locally on this browser
-            </label>
           </div>
 
           <!-- Connect button -->
           <button
             id="btn-start-call"
-            class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white py-3.5 px-6 rounded-xl font-medium tracking-tight flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 transition-all cursor-pointer"
+            class="w-full mt-4 bg-white hover:bg-neutral-200 text-black py-3 px-6 rounded-lg font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
           >
-            <i data-lucide="phone-call" class="w-4 h-4"></i>
-            Start Sales Pitch &ldquo;Call&rdquo;
+            <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+            Connect Salesman
           </button>
         </div>
       </div>
 
-      <!-- STATE 2: CONNECTING / ATTEMPTING HANDSHAKE -->
-      <div id="screen-connecting" class="fade-transition hidden w-full max-w-md bg-slate-900/50 border border-slate-900/80 p-10 rounded-2xl shadow-2xl text-center flex flex-col items-center justify-center min-h-[350px]">
-        <div class="relative w-48 h-48 mb-8 flex items-center justify-center">
+      <!-- STATE 2: CONNECTING / HANDSHAKE -->
+      <div id="screen-connecting" class="fade-transition hidden w-full max-w-sm bg-neutral-950 border border-neutral-900 p-8 rounded-2xl text-center flex flex-col items-center justify-center min-h-[300px]">
+        <div class="relative w-40 h-40 mb-6 flex items-center justify-center">
           <canvas id="canvas-connecting" class="absolute inset-0 w-full h-full"></canvas>
-          <div class="relative bg-slate-950 w-24 h-24 rounded-full flex items-center justify-center border border-amber-500/20 shadow-xl">
-            <i data-lucide="refresh-cw" class="w-8 h-8 text-amber-500 animate-spin"></i>
+          <div class="relative bg-neutral-900 w-20 h-20 rounded-full flex items-center justify-center border border-neutral-800 shadow-xl">
+            <i data-lucide="loader-2" class="w-6 h-6 text-white animate-spin"></i>
           </div>
         </div>
 
-        <h3 class="text-xl font-display font-medium text-white tracking-tight animate-pulse">
-          Initiating Session...
+        <h3 class="text-sm font-mono uppercase tracking-widest text-neutral-300">
+          Connecting Live Link...
         </h3>
-        <p class="text-sm text-slate-400 mt-2 max-w-xs leading-relaxed">
-          Connecting to Gemini Flash Live services. Please allow microphone access if prompted.
-        </p>
         
         <button
           id="btn-cancel-call"
-          class="mt-8 text-xs font-mono tracking-wider uppercase text-slate-500 hover:text-slate-300 transition-colors py-2 px-4 rounded border border-slate-800 hover:bg-slate-900 cursor-pointer"
+          class="mt-8 text-[10px] font-mono tracking-widest uppercase text-neutral-500 hover:text-neutral-300 transition-colors py-1.5 px-4 rounded border border-neutral-850 hover:bg-neutral-900 cursor-pointer"
         >
-          Cancel Call
+          Disconnect
         </button>
       </div>
 
       <!-- STATE 3: ACTIVE CONVERSATION -->
       <div id="screen-active" class="fade-transition hidden w-full max-w-3xl flex flex-col md:flex-row gap-6 items-stretch">
-        <!-- Call Stage (Left) -->
-        <div class="flex-1 bg-slate-900/50 border border-slate-900/80 p-8 rounded-2xl flex flex-col justify-between items-center text-center relative overflow-hidden min-h-[420px]">
-          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 self-center">
-            <i data-lucide="brain" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span class="text-[10px] font-mono text-emerald-400 tracking-wider uppercase font-medium">
-              Salesman: Dynamic Psychology Mode
-            </span>
+        <!-- Call Visualizer (Left) -->
+        <div class="flex-1 bg-neutral-950 border border-neutral-900 p-8 rounded-2xl flex flex-col justify-between items-center text-center min-h-[380px]">
+          <div class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 mb-2">
+            Live Stream
           </div>
 
-          <div class="relative w-56 h-56 my-4 flex items-center justify-center">
+          <div class="relative w-48 h-48 my-2 flex items-center justify-center">
             <canvas id="canvas-active" class="absolute inset-0 w-full h-full"></canvas>
-            <div class="relative bg-slate-950 w-28 h-28 rounded-full flex flex-col items-center justify-center shadow-2xl border border-slate-800">
-              <i data-lucide="volume-2" class="w-8 h-8 text-slate-400"></i>
+            <div class="relative bg-neutral-900 w-24 h-24 rounded-full flex flex-col items-center justify-center shadow-2xl border border-neutral-850">
+              <i data-lucide="mic" class="w-6 h-6 text-neutral-400"></i>
             </div>
           </div>
 
-          <div class="max-w-xs mt-4">
-            <h4 id="text-pitching-item" class="text-base font-display font-medium text-white leading-tight">
-              Pitching You
+          <div class="mt-4">
+            <h4 id="text-pitching-item" class="text-sm font-medium text-white tracking-tight">
+              Negotiation Active
             </h4>
-            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-              Objections? Skepticism? Push back! He is analyzing your traits to close the deal.
-            </p>
           </div>
 
           <button
             id="btn-end-call"
-            class="mt-6 bg-rose-600 hover:bg-rose-500 active:scale-[0.98] text-white py-3 px-6 rounded-xl font-medium tracking-tight flex items-center justify-center gap-2 shadow-lg shadow-rose-600/20 transition-all cursor-pointer"
+            class="mt-6 bg-red-950 hover:bg-red-900 text-red-200 py-2.5 px-6 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border border-red-900/30"
           >
-            <i data-lucide="phone-off" class="w-4 h-4"></i>
-            End Pitch Call
+            <i data-lucide="phone-off" class="w-3.5 h-3.5"></i>
+            End Stream
           </button>
         </div>
 
-        <!-- Transcript Window (Right) -->
-        <div class="w-full md:w-80 bg-slate-900/30 border border-slate-900/60 p-6 rounded-2xl flex flex-col justify-between">
+        <!-- Transcript Feed (Right) -->
+        <div class="w-full md:w-80 bg-neutral-950 border border-neutral-900 p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <h3 class="text-xs font-mono font-medium text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <i data-lucide="message-square" class="w-3.5 h-3.5 text-slate-500"></i>
-              Live Activity feed
-            </h3>
-            
-            <div id="live-transcript-feed" class="space-y-4 max-h-[280px] overflow-y-auto pr-1">
-              <div class="py-8 text-center text-slate-600 text-xs italic">
-                No verbal exchange transcribed yet. Talk into your mic to initiate conversation...
-              </div>
+            <div class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 mb-4 pb-2 border-b border-neutral-900">
+              Activity Feed
             </div>
-          </div>
-
-          <div class="mt-6 pt-4 border-t border-slate-900">
-            <div class="flex gap-2.5 items-start p-3 bg-indigo-500/5 rounded-xl border border-indigo-500/10">
-              <i data-lucide="info" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
-              <p class="text-[10px] text-slate-400 leading-normal">
-                <strong>Psychology Mode:</strong> The salesman responds dynamically. He is designed to hear and counter any pricing concerns, skepticism, or needs automatically. Say "deal" or "I'll buy it" to complete.
-              </p>
+            
+            <div id="live-transcript-feed" class="space-y-4 max-h-[250px] overflow-y-auto pr-1">
+              <div class="py-12 text-center text-neutral-600 text-xs italic">
+                Awaiting first turn...
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- STATE 4: ERROR DISPLAY SCREEN -->
-      <div id="screen-error" class="fade-transition hidden w-full max-w-md bg-slate-900/60 border border-slate-900 p-8 rounded-2xl shadow-2xl text-center">
-        <div class="w-14 h-14 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-          <i data-lucide="shield-alert" class="w-7 h-7"></i>
+      <!-- STATE 4: ERROR SCREEN -->
+      <div id="screen-error" class="fade-transition hidden w-full max-w-sm bg-neutral-950 border border-neutral-900 p-8 rounded-2xl text-center shadow-2xl">
+        <div class="w-12 h-12 bg-red-950/40 text-red-400 rounded-xl flex items-center justify-center mx-auto mb-5 border border-red-900/50">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
         </div>
-        <h3 class="text-lg font-display font-semibold text-white tracking-tight">
-          Pitch Session Failed
+        <h3 class="text-sm font-mono uppercase tracking-wider text-white">
+          Link Broken
         </h3>
-        <p id="error-text" class="text-sm text-slate-400 mt-2 leading-relaxed">
-          We couldn't connect or establish the live call with the salesman.
+        <p id="error-text" class="text-xs text-neutral-500 mt-3 leading-relaxed">
+          The live connection was closed.
         </p>
 
         <button
           id="btn-cancel-error"
           onclick="location.reload()"
-          class="w-full mt-6 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 px-4 rounded-xl text-sm font-medium transition-all cursor-pointer"
+          class="w-full mt-6 bg-neutral-900 hover:bg-neutral-850 text-neutral-200 py-2.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer"
         >
-          Adjust Settings
+          Reconfigure
         </button>
       </div>
 
-      <!-- STATE 5: DEAL CLOSED (VICTORY!) -->
-      <div id="screen-closed" class="fade-transition hidden w-full max-w-2xl bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500/30 shadow-2xl shadow-emerald-950/20 p-8 rounded-3xl relative">
-        <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-slate-950 font-mono text-[10px] uppercase font-bold tracking-widest px-4 py-1.5 rounded-full shadow-lg shadow-emerald-500/20 flex items-center gap-1.5">
-          <i data-lucide="award" class="w-3.5 h-3.5"></i>
-          Deal Closed Successfully
-        </div>
-
-        <div class="text-center mt-4 mb-8">
-          <h2 class="text-4xl font-display font-bold tracking-tight text-white bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 animate-pulse">
-            CONGRATULATIONS!
+      <!-- STATE 5: DEAL CLOSED (VICTORY) -->
+      <div id="screen-closed" class="fade-transition hidden w-full max-w-xl bg-neutral-950 border border-emerald-900/50 p-8 rounded-2xl relative shadow-2xl">
+        <div class="text-center mt-2 mb-6">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 text-[10px] font-mono uppercase tracking-widest mb-4">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+            Deal Finalized
+          </div>
+          <h2 class="text-2xl font-display font-medium tracking-tight text-white">
+            Agreement Secured
           </h2>
-          <p class="text-sm text-slate-400 mt-1.5">
-            The salesman has successfully closed the deal. Here is the receipt and psychological debrief.
-          </p>
         </div>
 
-        <!-- Master Sales Invoice Agreement -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div class="bg-slate-900/60 border border-slate-800/80 p-4 rounded-xl flex flex-col justify-center">
-            <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Product Sold</span>
-            <span id="invoice-product" class="text-base font-display font-semibold text-white mt-1 flex items-center gap-1.5">
-              Porsche 911
-            </span>
+        <!-- Structured Ledger Receipt -->
+        <div class="divide-y divide-neutral-900 border-y border-neutral-900 mb-6">
+          <div class="py-3 flex justify-between items-center text-xs">
+            <span class="font-mono text-neutral-500 uppercase tracking-wider text-[10px]">Product</span>
+            <span id="invoice-product" class="font-medium text-white">Porsche 911</span>
           </div>
-          <div class="bg-slate-900/60 border border-slate-800/80 p-4 rounded-xl flex flex-col justify-center">
-            <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Acquired By</span>
-            <span id="invoice-buyer" class="text-base font-display font-semibold text-white mt-1 flex items-center gap-1.5">
-              The Sophisticated Buyer
-            </span>
+          <div class="py-3 flex justify-between items-center text-xs">
+            <span class="font-mono text-neutral-500 uppercase tracking-wider text-[10px]">Buyer</span>
+            <span id="invoice-buyer" class="font-medium text-white">The Client</span>
           </div>
-          <div class="bg-slate-900/60 border border-slate-800/80 p-4 rounded-xl flex flex-col justify-center">
-            <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Agreed Value</span>
-            <span id="invoice-price" class="text-base font-display font-semibold text-emerald-400 mt-1 flex items-center gap-1.5">
-              Premium standard value
-            </span>
+          <div class="py-3 flex justify-between items-center text-xs">
+            <span class="font-mono text-neutral-500 uppercase tracking-wider text-[10px]">Terms / Price</span>
+            <span id="invoice-price" class="font-medium text-emerald-400">Accepted Contract</span>
           </div>
         </div>
 
-        <!-- Psychological Debrief Dossier -->
-        <div class="bg-indigo-950/20 border border-indigo-900/30 p-6 rounded-2xl mb-8">
+        <!-- Psychological Report Dossier -->
+        <div class="bg-neutral-900/40 border border-neutral-900 p-5 rounded-xl mb-6">
           <div class="flex items-center gap-2 mb-3">
-            <i data-lucide="brain" class="w-5 h-5 text-indigo-400"></i>
-            <h3 class="text-sm font-display font-semibold text-indigo-300 tracking-tight">
-              Persuasion Tactics & psychological dossier
+            <i data-lucide="file-text" class="w-4 h-4 text-neutral-400"></i>
+            <h3 class="text-xs font-mono uppercase tracking-wider text-neutral-300">
+              Psychological Dossier
             </h3>
           </div>
-          <p id="dossier-text" class="text-xs text-slate-300/90 leading-relaxed font-mono whitespace-pre-wrap">
-            Analyzing transaction footprint...
+          <p id="dossier-text" class="text-xs text-neutral-400 leading-relaxed font-mono whitespace-pre-wrap">
+            Analyzing footprints...
           </p>
         </div>
 
-        <!-- Pitch restart button -->
+        <!-- Reset Button -->
         <button
           id="btn-restart"
-          class="w-full bg-slate-900 hover:bg-slate-850 active:scale-[0.98] border border-slate-800 text-slate-300 py-3.5 px-6 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer"
+          class="w-full bg-neutral-900 hover:bg-neutral-850 text-white py-3 px-6 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border border-neutral-800"
         >
-          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-          Initiate New Sales Negotiation Session
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          New Negotiation
         </button>
       </div>
 
     </main>
 
-    <!-- Global Human footer -->
-    <footer class="border-t border-slate-900/60 py-4 text-center text-[10px] font-mono text-slate-600 relative z-10">
-      Zero-dependency standard static client &mdash; Ready for local double-click and GitHub Pages
+    <!-- Global Minimalist Footer -->
+    <footer class="py-6 text-center text-[9px] font-mono tracking-widest text-neutral-600 uppercase relative z-10">
+      Static Client Sandbox &bull; Pure Client-Side WebSocket
     </footer>
 
     <!-- Native JavaScript Implementation -->

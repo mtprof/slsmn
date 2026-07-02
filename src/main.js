@@ -561,8 +561,8 @@ document.addEventListener("DOMContentLoaded", () => {
   async function connectToLiveApi() {
     apiKey = inputApiKey.value.trim();
     productName = inputProduct.value.trim();
-    voiceName = selectVoice.value;
-    rememberSettings = checkboxRemember.checked;
+    voiceName = selectVoice ? selectVoice.value : "Zephyr";
+    rememberSettings = checkboxRemember ? checkboxRemember.checked : true;
 
     if (!apiKey) {
       if (errorText) errorText.innerText = "Please input a valid Gemini API Key.";
@@ -593,7 +593,7 @@ document.addEventListener("DOMContentLoaded", () => {
     transitionTo("connecting");
 
     try {
-      const endpoint = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(apiKey)}`;
+      const endpoint = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(apiKey)}`;
       socket = new WebSocket(endpoint);
 
       socket.onopen = () => {
@@ -615,7 +615,7 @@ Follow this metacognitive sales methodology:
 
         const setupMsg = {
           setup: {
-            model: "models/gemini-2.0-flash-exp",
+            model: "models/gemini-3.1-flash-live-preview",
             generationConfig: {
               responseModalities: ["AUDIO"],
               speechConfig: {
