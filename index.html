@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Salesman</title>
-    <!-- Google Fonts -->
+    
+    <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,43 +29,49 @@
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-      .fade-transition {
-        transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      body {
+        background-color: #000000;
+        background-image: 
+          radial-gradient(circle at 50% -20%, rgba(24, 24, 27, 0.4) 0%, transparent 60%),
+          radial-gradient(circle at 50% 120%, rgba(24, 24, 27, 0.2) 0%, transparent 50%);
+      }
+      .transition-all-custom {
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       }
       /* Custom elegant scrollbar */
       ::-webkit-scrollbar {
-        width: 4px;
+        width: 3px;
       }
       ::-webkit-scrollbar-track {
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: #262626;
-        border-radius: 2px;
+        background: #1f1f1f;
+        border-radius: 99px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #404040;
+        background: #2e2e2e;
       }
     </style>
   </head>
-  <body class="min-h-screen bg-black text-neutral-100 flex flex-col justify-between font-sans selection:bg-neutral-800 selection:text-white relative overflow-hidden antialiased">
+  <body class="min-h-screen text-neutral-200 flex flex-col justify-between font-sans selection:bg-neutral-800 selection:text-white relative overflow-hidden antialiased">
     
-    <!-- Confetti canvas for victory deals -->
+    <!-- Victory Canvas -->
     <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none z-50"></canvas>
 
     <!-- Sleek Minimal Header -->
-    <header class="px-8 py-6 flex items-center justify-between relative z-10 max-w-5xl mx-auto w-full">
-      <div class="flex items-center gap-2.5">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <h1 class="text-xs font-mono uppercase tracking-widest text-neutral-400 font-medium">
-          AI Salesman Live
+    <header class="px-8 py-8 flex items-center justify-between relative z-10 max-w-4xl mx-auto w-full">
+      <div class="flex items-center gap-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span>
+        <h1 class="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-400 font-medium">
+          Sales Agent Live
         </h1>
       </div>
 
-      <!-- Real-time Call Speaker Badge -->
+      <!-- Real-time Status -->
       <div id="speaker-badge" class="flex items-center gap-2">
-        <span id="active-speaker-dot" class="w-1.5 h-1.5 rounded-full bg-neutral-800"></span>
-        <span id="active-speaker-text" class="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Silent</span>
+        <span id="active-speaker-dot" class="w-1.5 h-1.5 rounded-full bg-neutral-800 transition-colors duration-300"></span>
+        <span id="active-speaker-text" class="text-[9px] font-mono uppercase tracking-widest text-neutral-500">Idle</span>
       </div>
     </header>
 
@@ -72,112 +79,113 @@
     <main class="flex-1 w-full max-w-4xl mx-auto px-6 py-4 flex flex-col justify-center items-center relative z-10">
       
       <!-- STATE 1: IDLE CONFIGURATION FORM -->
-      <div id="screen-idle" class="fade-transition w-full max-w-md bg-neutral-950 border border-neutral-900 p-8 rounded-2xl relative shadow-2xl">
-        <div class="mb-8">
-          <h2 class="text-xl font-display font-medium tracking-tight text-white">
-            Configure Negotiation
+      <div id="screen-idle" class="transition-all-custom w-full max-w-sm bg-neutral-950/60 border border-neutral-900/80 p-8 rounded-2xl relative shadow-2xl backdrop-blur-xl">
+        <div class="mb-8 text-center">
+          <h2 class="text-lg font-display font-medium tracking-tight text-white">
+            Initiate Stream
           </h2>
+          <p class="text-[11px] text-neutral-500 mt-1.5 max-w-[240px] mx-auto leading-relaxed">
+            Configure the live voice channel with your API credentials and product parameters.
+          </p>
         </div>
 
-        <div class="space-y-6">
+        <div class="space-y-5">
           <!-- Field 1: API Key -->
           <div>
-            <label for="input-api-key" class="block text-[10px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
+            <label for="input-api-key" class="block text-[9px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
               Gemini API Key
             </label>
             <input
               id="input-api-key"
               type="password"
-              placeholder="Paste key (AIzaSy...)"
-              class="w-full px-4 py-3 bg-neutral-900/60 border border-neutral-850 rounded-lg focus:border-neutral-500 focus:outline-none text-white placeholder-neutral-600 text-sm transition-all"
+              placeholder="Paste AIzaSy Key"
+              class="w-full px-4 py-3 bg-neutral-900/40 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 focus:outline-none text-white placeholder-neutral-700 text-xs rounded-lg transition-all font-mono"
             />
           </div>
 
           <!-- Field 2: Product Name -->
           <div>
-            <label for="input-product" class="block text-[10px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
-              Product to Sell
+            <label for="input-product" class="block text-[9px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
+              Target Product
             </label>
             <input
               id="input-product"
               type="text"
-              placeholder="e.g. Porsche 911"
-              class="w-full px-4 py-3 bg-neutral-900/60 border border-neutral-850 rounded-lg focus:border-neutral-500 focus:outline-none text-white placeholder-neutral-600 text-sm transition-all font-medium"
+              placeholder="e.g. Porsche 911 GT3"
+              class="w-full px-4 py-3 bg-neutral-900/40 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 focus:outline-none text-white placeholder-neutral-700 text-xs rounded-lg transition-all font-medium"
             />
           </div>
 
           <!-- Connect button -->
           <button
             id="btn-start-call"
-            class="w-full mt-4 bg-white hover:bg-neutral-200 text-black py-3 px-6 rounded-lg font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
+            class="w-full mt-4 bg-white hover:bg-neutral-200 active:scale-[0.98] text-black py-3 px-6 rounded-lg font-medium text-xs tracking-wider uppercase transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
           >
-            <i data-lucide="phone" class="w-3.5 h-3.5"></i>
-            Connect Salesman
+            Connect Voice Channel
           </button>
         </div>
       </div>
 
       <!-- STATE 2: CONNECTING / HANDSHAKE -->
-      <div id="screen-connecting" class="fade-transition hidden w-full max-w-sm bg-neutral-950 border border-neutral-900 p-8 rounded-2xl text-center flex flex-col items-center justify-center min-h-[300px]">
+      <div id="screen-connecting" class="transition-all-custom hidden w-full max-w-sm bg-neutral-950/60 border border-neutral-900 p-8 rounded-2xl text-center flex flex-col items-center justify-center min-h-[320px] backdrop-blur-xl">
         <div class="relative w-40 h-40 mb-6 flex items-center justify-center">
           <canvas id="canvas-connecting" class="absolute inset-0 w-full h-full"></canvas>
-          <div class="relative bg-neutral-900 w-20 h-20 rounded-full flex items-center justify-center border border-neutral-800 shadow-xl">
-            <i data-lucide="loader-2" class="w-6 h-6 text-white animate-spin"></i>
+          <div class="relative bg-neutral-900/50 w-20 h-20 rounded-full flex items-center justify-center border border-neutral-900">
+            <i data-lucide="phone" class="w-5 h-5 text-neutral-400 animate-pulse"></i>
           </div>
         </div>
 
-        <h3 class="text-sm font-mono uppercase tracking-widest text-neutral-300">
-          Connecting Live Link...
+        <h3 class="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-400">
+          Establishing Link
         </h3>
         
         <button
           id="btn-cancel-call"
-          class="mt-8 text-[10px] font-mono tracking-widest uppercase text-neutral-500 hover:text-neutral-300 transition-colors py-1.5 px-4 rounded border border-neutral-850 hover:bg-neutral-900 cursor-pointer"
+          class="mt-8 text-[9px] font-mono tracking-widest uppercase text-neutral-500 hover:text-neutral-300 transition-colors py-1.5 px-4 rounded border border-neutral-900 hover:bg-neutral-900/60 cursor-pointer"
         >
           Disconnect
         </button>
       </div>
 
       <!-- STATE 3: ACTIVE CONVERSATION -->
-      <div id="screen-active" class="fade-transition hidden w-full max-w-3xl flex flex-col md:flex-row gap-6 items-stretch">
+      <div id="screen-active" class="transition-all-custom hidden w-full max-w-3xl flex flex-col md:flex-row gap-6 items-stretch">
         <!-- Call Visualizer (Left) -->
-        <div class="flex-1 bg-neutral-950 border border-neutral-900 p-8 rounded-2xl flex flex-col justify-between items-center text-center min-h-[380px]">
-          <div class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 mb-2">
-            Live Stream
+        <div class="flex-1 bg-neutral-950/60 border border-neutral-900 p-8 rounded-2xl flex flex-col justify-between items-center text-center min-h-[380px] backdrop-blur-xl">
+          <div class="text-[10px] font-mono tracking-widest uppercase text-neutral-500">
+            Live Link Active
           </div>
 
-          <div class="relative w-48 h-48 my-2 flex items-center justify-center">
+          <div class="relative w-44 h-44 my-4 flex items-center justify-center">
             <canvas id="canvas-active" class="absolute inset-0 w-full h-full"></canvas>
-            <div class="relative bg-neutral-900 w-24 h-24 rounded-full flex flex-col items-center justify-center shadow-2xl border border-neutral-850">
-              <i data-lucide="mic" class="w-6 h-6 text-neutral-400"></i>
+            <div class="relative bg-neutral-900/40 w-20 h-20 rounded-full flex flex-col items-center justify-center border border-neutral-900">
+              <i data-lucide="mic" class="w-5 h-5 text-neutral-400"></i>
             </div>
           </div>
 
-          <div class="mt-4">
-            <h4 id="text-pitching-item" class="text-sm font-medium text-white tracking-tight">
+          <div class="space-y-1">
+            <h4 id="text-pitching-item" class="text-xs font-mono uppercase tracking-widest text-neutral-400">
               Negotiation Active
             </h4>
           </div>
 
           <button
             id="btn-end-call"
-            class="mt-6 bg-red-950 hover:bg-red-900 text-red-200 py-2.5 px-6 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border border-red-900/30"
+            class="bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-neutral-300 py-2.5 px-6 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-2 border border-neutral-800/80"
           >
-            <i data-lucide="phone-off" class="w-3.5 h-3.5"></i>
             End Stream
           </button>
         </div>
 
         <!-- Transcript Feed (Right) -->
-        <div class="w-full md:w-80 bg-neutral-950 border border-neutral-900 p-6 rounded-2xl flex flex-col justify-between">
-          <div>
-            <div class="text-[10px] font-mono tracking-widest uppercase text-neutral-500 mb-4 pb-2 border-b border-neutral-900">
+        <div class="w-full md:w-80 bg-neutral-950/60 border border-neutral-900 p-6 rounded-2xl flex flex-col justify-between backdrop-blur-xl">
+          <div class="flex flex-col h-full justify-between">
+            <div class="text-[9px] font-mono tracking-widest uppercase text-neutral-500 mb-4 pb-2 border-b border-neutral-900/80">
               Activity Feed
             </div>
             
-            <div id="live-transcript-feed" class="space-y-4 max-h-[250px] overflow-y-auto pr-1">
-              <div class="py-12 text-center text-neutral-600 text-xs italic">
-                Awaiting first turn...
+            <div id="live-transcript-feed" class="flex-1 space-y-4 max-h-[250px] overflow-y-auto pr-1">
+              <div class="py-12 text-center text-neutral-600 text-[11px] font-mono uppercase tracking-widest">
+                Awaiting connection...
               </div>
             </div>
           </div>
@@ -185,12 +193,12 @@
       </div>
 
       <!-- STATE 4: ERROR SCREEN -->
-      <div id="screen-error" class="fade-transition hidden w-full max-w-sm bg-neutral-950 border border-neutral-900 p-8 rounded-2xl text-center shadow-2xl">
-        <div class="w-12 h-12 bg-red-950/40 text-red-400 rounded-xl flex items-center justify-center mx-auto mb-5 border border-red-900/50">
-          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+      <div id="screen-error" class="transition-all-custom hidden w-full max-w-sm bg-neutral-950/60 border border-neutral-900 p-8 rounded-2xl text-center shadow-2xl backdrop-blur-xl">
+        <div class="w-10 h-10 bg-neutral-900 text-neutral-400 rounded-lg flex items-center justify-center mx-auto mb-5 border border-neutral-850">
+          <i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i>
         </div>
-        <h3 class="text-sm font-mono uppercase tracking-wider text-white">
-          Link Broken
+        <h3 class="text-[10px] font-mono uppercase tracking-wider text-neutral-300">
+          Stream Disrupted
         </h3>
         <p id="error-text" class="text-xs text-neutral-500 mt-3 leading-relaxed">
           The live connection was closed.
@@ -199,68 +207,67 @@
         <button
           id="btn-cancel-error"
           onclick="location.reload()"
-          class="w-full mt-6 bg-neutral-900 hover:bg-neutral-850 text-neutral-200 py-2.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer"
+          class="w-full mt-6 bg-neutral-900 hover:bg-neutral-850 text-neutral-200 py-2.5 rounded-lg text-[9px] font-mono uppercase tracking-widest transition-colors cursor-pointer border border-neutral-800"
         >
           Reconfigure
         </button>
       </div>
 
       <!-- STATE 5: DEAL CLOSED (VICTORY) -->
-      <div id="screen-closed" class="fade-transition hidden w-full max-w-xl bg-neutral-950 border border-emerald-900/50 p-8 rounded-2xl relative shadow-2xl">
+      <div id="screen-closed" class="transition-all-custom hidden w-full max-w-lg bg-neutral-950/60 border border-neutral-900 p-8 rounded-2xl relative shadow-2xl backdrop-blur-xl">
         <div class="text-center mt-2 mb-6">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 text-[10px] font-mono uppercase tracking-widest mb-4">
-            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
-            Deal Finalized
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/20 border border-emerald-900/30 text-emerald-400 text-[9px] font-mono uppercase tracking-widest mb-4">
+            <i data-lucide="check-circle" class="w-3 h-3"></i>
+            Deal Closed
           </div>
-          <h2 class="text-2xl font-display font-medium tracking-tight text-white">
+          <h2 class="text-xl font-display font-medium tracking-tight text-white">
             Agreement Secured
           </h2>
         </div>
 
         <!-- Structured Ledger Receipt -->
         <div class="divide-y divide-neutral-900 border-y border-neutral-900 mb-6">
-          <div class="py-3 flex justify-between items-center text-xs">
-            <span class="font-mono text-neutral-500 uppercase tracking-wider text-[10px]">Product</span>
+          <div class="py-3.5 flex justify-between items-center text-xs">
+            <span class="font-mono text-neutral-500 uppercase tracking-widest text-[9px]">Product</span>
             <span id="invoice-product" class="font-medium text-white">Porsche 911</span>
           </div>
-          <div class="py-3 flex justify-between items-center text-xs">
-            <span class="font-mono text-neutral-500 uppercase tracking-wider text-[10px]">Buyer</span>
+          <div class="py-3.5 flex justify-between items-center text-xs">
+            <span class="font-mono text-neutral-500 uppercase tracking-widest text-[9px]">Buyer</span>
             <span id="invoice-buyer" class="font-medium text-white">The Client</span>
           </div>
-          <div class="py-3 flex justify-between items-center text-xs">
-            <span class="font-mono text-neutral-500 uppercase tracking-wider text-[10px]">Terms / Price</span>
+          <div class="py-3.5 flex justify-between items-center text-xs">
+            <span class="font-mono text-neutral-500 uppercase tracking-widest text-[9px]">Terms</span>
             <span id="invoice-price" class="font-medium text-emerald-400">Accepted Contract</span>
           </div>
         </div>
 
         <!-- Psychological Report Dossier -->
-        <div class="bg-neutral-900/40 border border-neutral-900 p-5 rounded-xl mb-6">
+        <div class="bg-neutral-900/20 border border-neutral-900 p-5 rounded-xl mb-6">
           <div class="flex items-center gap-2 mb-3">
-            <i data-lucide="file-text" class="w-4 h-4 text-neutral-400"></i>
-            <h3 class="text-xs font-mono uppercase tracking-wider text-neutral-300">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-neutral-400"></i>
+            <h3 class="text-[9px] font-mono uppercase tracking-widest text-neutral-300">
               Psychological Dossier
             </h3>
           </div>
           <p id="dossier-text" class="text-xs text-neutral-400 leading-relaxed font-mono whitespace-pre-wrap">
-            Analyzing footprints...
+            Analyzing transaction metrics...
           </p>
         </div>
 
         <!-- Reset Button -->
         <button
           id="btn-restart"
-          class="w-full bg-neutral-900 hover:bg-neutral-850 text-white py-3 px-6 rounded-lg text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border border-neutral-800"
+          class="w-full bg-white hover:bg-neutral-200 text-black py-3 px-6 rounded-lg text-[10px] font-mono uppercase tracking-widest font-medium transition-colors cursor-pointer flex items-center justify-center gap-2"
         >
-          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-          New Negotiation
+          New Stream
         </button>
       </div>
 
     </main>
 
     <!-- Global Minimalist Footer -->
-    <footer class="py-6 text-center text-[9px] font-mono tracking-widest text-neutral-600 uppercase relative z-10">
-      Static Client Sandbox &bull; Pure Client-Side WebSocket
+    <footer class="py-8 text-center text-[8px] font-mono tracking-[0.25em] text-neutral-600 uppercase relative z-10">
+      Bi-Directional Audio Stream &bull; Client-Side WebSocket Link
     </footer>
 
     <!-- Native JavaScript Implementation -->
