@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Inputs
   const inputApiKey = document.getElementById("input-api-key");
   const inputProduct = document.getElementById("input-product");
+  const selectModel = document.getElementById("select-model");
   const selectVoice = document.getElementById("select-voice");
   const checkboxRemember = document.getElementById("checkbox-remember");
 
@@ -41,12 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- State Managers ---
   let apiKey = localStorage.getItem("gemini_sales_api_key") || "";
   let productName = localStorage.getItem("gemini_sales_product") || "Porsche 911";
-  let voiceName = localStorage.getItem("gemini_sales_voice") || "Zephyr";
+  let modelName = localStorage.getItem("gemini_sales_model") || "models/gemini-3.1-flash-live-preview";
+  let voiceName = localStorage.getItem("gemini_sales_voice") || "Puck";
   let rememberSettings = localStorage.getItem("gemini_sales_remember") !== "false";
 
   // Pre-fill fields
   if (inputApiKey) inputApiKey.value = apiKey;
   if (inputProduct) inputProduct.value = productName;
+  if (selectModel) selectModel.value = modelName;
   if (selectVoice) selectVoice.value = voiceName;
   if (checkboxRemember) checkboxRemember.checked = rememberSettings;
 
@@ -434,71 +437,6 @@ document.addEventListener("DOMContentLoaded", () => {
     liveTranscriptFeed.scrollTop = liveTranscriptFeed.scrollHeight;
   }
 
-  // --- Microphone capture engine ---
-  async function startMicrophoneRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        }
-      });
-
-      micStream = stream;
-      inputAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = inputAudioCtx.createMediaStreamSource(stream);
-      processorNode = inputAudioCtx.createScriptProcessor(2048, 1, 1);
-
-      source.connect(processorNode);
-      processorNode.connect(inputAudioCtx.destination);
-
-      const inputSampleRate = inputAudioCtx.sampleRate;
-
-      processorNode.onaudioprocess = (e) => {
-        const inputData = e.inputBuffer.getChannelData(0);
-
-        // Compute volume
-        let sumSquares = 0;
-        for (let i = 0; i < inputData.length; i++) {
-          sumSquares += inputData[i] * inputData[i];
-        }
-        const rms = Math.sqrt(sumSquares / inputData.length);
-        userVolume = Math.max(userVolume, rms);
-
-        // Interruption Check
-        if (rms > 0.012) {
-          activeSpeaker = "customer";
-          updateActiveSpeakerUI();
-          if (scheduledNodes.length > 0) {
-            clearSalesmanAudioQueue();
-          }
-        }
-
-        // Downsample and deliver to live websocket
-        const pcmBuffer = downsampleAndPCMEncode(inputData, inputSampleRate);
-        const base64Audio = arrayBufferToBase64(pcmBuffer);
-
-        if (socket && socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({
-            realtimeInput: {
-              mediaChunks: [{
-                mimeType: "audio/pcm",
-                data: base64Audio
-              }]
-            }
-          }));
-        }
-      };
-
-    } catch (err) {
-      console.error("Mic access failed", err);
-      if (errorText) errorText.innerText = "Could not access microphone. Ensure browser permissions are enabled.";
-      transitionTo("error");
-      terminateSession();
-    }
-  }
-
   // --- Confetti Canvas Animation ---
   function triggerConfetti() {
     const canvas = document.getElementById("confetti-canvas");
@@ -561,36 +499,33 @@ document.addEventListener("DOMContentLoaded", () => {
   async function connectToLiveApi() {
     apiKey = inputApiKey.value.trim();
     productName = inputProduct.value.trim();
-    voiceName = selectVoice ? selectVoice.value : "Zephyr";
+    voiceName = selectVoice ? selectVoice.value : "Puck";
+    modelName = selectModel ? selectModel.value : "models/gemini-3.1-flash-live-preview";
     rememberSettings = checkboxRemember ? checkboxRemember.checked : true;
-
-    if (!apiKey) {
-      if (errorText) errorText.innerText = "Please input a valid Gemini API Key.";
-      transitionTo("error");
-      return;
-    }
-    if (!productName) {
-      if (errorText) errorText.innerText = "Please input a product to sell.";
-      transitionTo("error");
-      return;
-    }
 
     // Save configurations
     if (rememberSettings) {
       localStorage.setItem("gemini_sales_api_key", apiKey);
       localStorage.setItem("gemini_sales_product", productName);
       localStorage.setItem("gemini_sales_voice", voiceName);
+      localStorage.setItem("gemini_sales_model", modelName);
       localStorage.setItem("gemini_sales_remember", "true");
     } else {
       localStorage.removeItem("gemini_sales_api_key");
       localStorage.removeItem("gemini_sales_product");
       localStorage.removeItem("gemini_sales_voice");
+      localStorage.removeItem("gemini_sales_model");
       localStorage.setItem("gemini_sales_remember", "false");
     }
 
     // Prepare transcript feed
-    if (liveTranscriptFeed) liveTranscriptFeed.innerHTML = "";
-    transitionTo("connecting");
+    if (liveTranscriptFeed) {
+      liveTranscriptFeed.innerHTML = `
+        <div class="py-12 text-center text-emerald-400/80 text-[11px] font-mono uppercase tracking-widest animate-pulse">
+          Starting Negotiator Link...
+        </div>
+      `;
+    }
 
     try {
       const endpoint = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(apiKey)}`;
@@ -615,7 +550,7 @@ Follow this metacognitive sales methodology:
 
         const setupMsg = {
           setup: {
-            model: "models/gemini-3.1-flash-live-preview",
+            model: modelName,
             generationConfig: {
               responseModalities: ["AUDIO"],
               speechConfig: {
@@ -671,7 +606,13 @@ Follow this metacognitive sales methodology:
           if (response.setupComplete) {
             transitionTo("active");
             if (textPitchingItem) textPitchingItem.innerText = `Pitching You: ${productName}`;
-            startMicrophoneRecording();
+            if (liveTranscriptFeed) {
+              liveTranscriptFeed.innerHTML = `
+                <div class="py-4 text-center text-neutral-600 text-[10px] font-mono uppercase tracking-widest border-b border-neutral-900 pb-2 mb-4">
+                  Connection established. Speak now...
+                </div>
+              `;
+            }
             return;
           }
 
@@ -758,7 +699,110 @@ Follow this metacognitive sales methodology:
   }
 
   // --- Bind Interactive Action Event Listeners ---
-  if (btnStartCall) btnStartCall.addEventListener("click", connectToLiveApi);
+  if (btnStartCall) {
+    btnStartCall.addEventListener("click", async () => {
+      apiKey = inputApiKey.value.trim();
+      productName = inputProduct.value.trim();
+
+      if (!apiKey) {
+        if (errorText) errorText.innerText = "Please input a valid Gemini API Key.";
+        transitionTo("error");
+        return;
+      }
+      if (!productName) {
+        if (errorText) errorText.innerText = "Please input a product to sell.";
+        transitionTo("error");
+        return;
+      }
+
+      // 1. Transition immediately to show connecting screen
+      transitionTo("connecting");
+
+      // 2. Pre-initialize/resume playout AudioContext synchronously in user-gesture stack
+      try {
+        if (!outputAudioCtx || outputAudioCtx.state === "closed") {
+          outputAudioCtx = new (window.AudioContext || window.webkitAudioContext)({
+            sampleRate: 24000
+          });
+        }
+        if (outputAudioCtx.state === "suspended") {
+          await outputAudioCtx.resume();
+        }
+        nextStartTime = outputAudioCtx.currentTime;
+      } catch (audioErr) {
+        console.warn("Playout AudioContext pre-initialization ignored or postponed", audioErr);
+      }
+
+      // 3. Request user microphone stream synchronously in user-gesture stack
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+
+        micStream = stream;
+        inputAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = inputAudioCtx.createMediaStreamSource(stream);
+        processorNode = inputAudioCtx.createScriptProcessor(2048, 1, 1);
+
+        source.connect(processorNode);
+        processorNode.connect(inputAudioCtx.destination);
+
+        const inputSampleRate = inputAudioCtx.sampleRate;
+
+        processorNode.onaudioprocess = (e) => {
+          const inputData = e.inputBuffer.getChannelData(0);
+
+          // Compute user input volume
+          let sumSquares = 0;
+          for (let i = 0; i < inputData.length; i++) {
+            sumSquares += inputData[i] * inputData[i];
+          }
+          const rms = Math.sqrt(sumSquares / inputData.length);
+          userVolume = Math.max(userVolume, rms);
+
+          // Voice Activity / Interruption Handler
+          if (rms > 0.012) {
+            activeSpeaker = "customer";
+            updateActiveSpeakerUI();
+            if (scheduledNodes.length > 0) {
+              clearSalesmanAudioQueue();
+            }
+          }
+
+          // Downsample and stream pcm chunks to WebSocket only when active
+          const pcmBuffer = downsampleAndPCMEncode(inputData, inputSampleRate);
+          const base64Audio = arrayBufferToBase64(pcmBuffer);
+
+          if (callStatus === "active" && socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({
+              realtimeInput: {
+                mediaChunks: [{
+                  mimeType: "audio/pcm",
+                  data: base64Audio
+                }]
+              }
+            }));
+          }
+        };
+
+        // 4. Now that mic is successfully secured, open the WebSocket channel
+        await connectToLiveApi();
+
+      } catch (micErr) {
+        console.error("Microphone or playout permission request failed in click context", micErr);
+        if (errorText) {
+          errorText.innerText = "Could not access microphone. Ensure that you have allowed microphone permissions for this app in your browser settings.";
+        }
+        transitionTo("error");
+        terminateSession();
+      }
+    });
+  }
+
   if (btnCancelCall) btnCancelCall.addEventListener("click", () => {
     terminateSession();
     transitionTo("idle");
