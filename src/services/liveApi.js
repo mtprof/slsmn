@@ -115,6 +115,7 @@ Follow this metacognitive sales methodology:
           }
         };
 
+        console.log("WS Sending Setup:", JSON.stringify(setupMsg).substring(0, 500));
         this.socket.send(JSON.stringify(setupMsg));
       };
 
@@ -127,7 +128,19 @@ Follow this metacognitive sales methodology:
             const decoder = new TextDecoder('utf-8');
             rawData = decoder.decode(rawData);
           }
-          const response = JSON.parse(rawData);
+          
+          let response;
+          try {
+            response = JSON.parse(rawData);
+          } catch (e) {
+            console.error("Failed to parse JSON response:", rawData.substring(0, 100));
+            return;
+          }
+          
+          // Log only non-audio chunk messages to avoid spam
+          if (!response.serverContent?.modelTurn?.parts?.some(p => p.inlineData)) {
+             console.log("WS Receive:", JSON.stringify(response).substring(0, 500));
+          }
 
           // A: Handshake completion
           if (response.setupComplete) {
@@ -173,10 +186,12 @@ Follow this metacognitive sales methodology:
       };
 
       this.socket.onerror = (e) => {
+        console.error("WebSocket Error:", e);
         if (this.onError) this.onError(e);
       };
 
       this.socket.onclose = (event) => {
+        console.log("WebSocket Closed - Code:", event.code, "Reason:", event.reason);
         if (this.onClose) this.onClose(event);
       };
 

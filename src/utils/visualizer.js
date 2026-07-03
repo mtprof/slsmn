@@ -16,12 +16,19 @@ export function drawVisualizer(canvas, time, callStatus, activeSpeaker, state) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const width = canvas.width = canvas.clientWidth * window.devicePixelRatio;
-  const height = canvas.height = canvas.clientHeight * window.devicePixelRatio;
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
   const logicalWidth = canvas.clientWidth;
   const logicalHeight = canvas.clientHeight;
+  const physicalWidth = Math.floor(logicalWidth * window.devicePixelRatio);
+  const physicalHeight = Math.floor(logicalHeight * window.devicePixelRatio);
+
+  if (canvas.width !== physicalWidth || canvas.height !== physicalHeight) {
+    canvas.width = physicalWidth;
+    canvas.height = physicalHeight;
+  }
+  
+  ctx.save();
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
   ctx.clearRect(0, 0, logicalWidth, logicalHeight);
 
   const centerX = logicalWidth / 2;
@@ -94,4 +101,6 @@ export function drawVisualizer(canvas, time, callStatus, activeSpeaker, state) {
   ctx.fill();
   ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
   ctx.stroke();
+
+  ctx.restore();
 }
