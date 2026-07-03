@@ -1,7 +1,7 @@
 // Modern Vanilla JS Controller for the AI Salesman Live Prototype
 import { drawVisualizer } from "./utils/visualizer.js?v=5";
 import { generateLiveKitToken } from "./utils/livekitToken.js";
-import { Room, RoomEvent, createLocalAudioTrack, Track } from "livekit-client";
+import { Room, RoomEvent, createLocalAudioTrack, Track } from "https://esm.sh/livekit-client";
 
 document.addEventListener("DOMContentLoaded", () => {
   // --- UI Elements ---
@@ -14,11 +14,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Inputs
   const inputGeminiKey = document.getElementById("input-gemini-key");
   const inputLivekitUrl = document.getElementById("input-livekit-url");
+  const inputLivekitToken = document.getElementById("input-livekit-token");
   const inputLivekitKey = document.getElementById("input-livekit-key");
   const inputLivekitSecret = document.getElementById("input-livekit-secret");
   const inputProduct = document.getElementById("input-product");
   const selectVoice = document.getElementById("select-voice");
   const checkboxRemember = document.getElementById("checkbox-remember");
+
+  // Tab Auth Toggles
+  const tabTokenMode = document.getElementById("tab-token-mode");
+  const tabKeysMode = document.getElementById("tab-keys-mode");
+  const containerTokenMode = document.getElementById("container-token-mode");
+  const containerKeysMode = document.getElementById("container-keys-mode");
 
   // Buttons
   const btnStartCall = document.getElementById("btn-start-call");
@@ -46,8 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- State Managers ---
   let geminiKey = localStorage.getItem("gemini_sales_api_key") || "";
   let lkUrl = localStorage.getItem("lk_url") || "";
+  let lkToken = localStorage.getItem("lk_token") || "";
   let lkKey = localStorage.getItem("lk_key") || "";
   let lkSecret = localStorage.getItem("lk_secret") || "";
+  let currentAuthMode = localStorage.getItem("lk_auth_mode") || "token"; // "token" | "keys"
   let productName = localStorage.getItem("gemini_sales_product") || "Porsche 911";
   let voiceName = localStorage.getItem("gemini_sales_voice") || "Puck";
   let rememberSettings = localStorage.getItem("gemini_sales_remember") !== "false";
@@ -55,11 +64,43 @@ document.addEventListener("DOMContentLoaded", () => {
   // Pre-fill fields
   if (inputGeminiKey) inputGeminiKey.value = geminiKey;
   if (inputLivekitUrl) inputLivekitUrl.value = lkUrl;
+  if (inputLivekitToken) inputLivekitToken.value = lkToken;
   if (inputLivekitKey) inputLivekitKey.value = lkKey;
   if (inputLivekitSecret) inputLivekitSecret.value = lkSecret;
   if (inputProduct) inputProduct.value = productName;
   if (selectVoice) selectVoice.value = voiceName;
   if (checkboxRemember) checkboxRemember.checked = rememberSettings;
+
+  // Set Auth Mode active tabs on initial load
+  function applyAuthModeUI() {
+    if (!tabTokenMode || !tabKeysMode || !containerTokenMode || !containerKeysMode) return;
+    if (currentAuthMode === "token") {
+      tabTokenMode.className = "flex-1 py-1.5 text-[8px] font-mono uppercase tracking-wider text-center rounded bg-neutral-800 text-white cursor-pointer transition-all";
+      tabKeysMode.className = "flex-1 py-1.5 text-[8px] font-mono uppercase tracking-wider text-center rounded text-neutral-400 hover:text-neutral-200 cursor-pointer transition-all";
+      containerTokenMode.classList.remove("hidden");
+      containerKeysMode.classList.add("hidden");
+    } else {
+      tabKeysMode.className = "flex-1 py-1.5 text-[8px] font-mono uppercase tracking-wider text-center rounded bg-neutral-800 text-white cursor-pointer transition-all";
+      tabTokenMode.className = "flex-1 py-1.5 text-[8px] font-mono uppercase tracking-wider text-center rounded text-neutral-400 hover:text-neutral-200 cursor-pointer transition-all";
+      containerKeysMode.classList.remove("hidden");
+      containerTokenMode.classList.add("hidden");
+    }
+  }
+  applyAuthModeUI();
+
+  // Tab listeners
+  if (tabTokenMode) {
+    tabTokenMode.addEventListener("click", () => {
+      currentAuthMode = "token";
+      applyAuthModeUI();
+    });
+  }
+  if (tabKeysMode) {
+    tabKeysMode.addEventListener("click", () => {
+      currentAuthMode = "keys";
+      applyAuthModeUI();
+    });
+  }
 
   // Real-time audio states
   let callStatus = "idle"; // "idle" | "connecting" | "active" | "error" | "closed"
@@ -257,6 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function initializeSession() {
     geminiKey = inputGeminiKey.value.trim();
     lkUrl = inputLivekitUrl.value.trim();
+    lkToken = inputLivekitToken.value.trim();
     lkKey = inputLivekitKey.value.trim();
     lkSecret = inputLivekitSecret.value.trim();
     productName = inputProduct.value.trim();
@@ -267,16 +309,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (rememberSettings) {
       localStorage.setItem("gemini_sales_api_key", geminiKey);
       localStorage.setItem("lk_url", lkUrl);
+      localStorage.setItem("lk_token", lkToken);
       localStorage.setItem("lk_key", lkKey);
       localStorage.setItem("lk_secret", lkSecret);
+      localStorage.setItem("lk_auth_mode", currentAuthMode);
       localStorage.setItem("gemini_sales_product", productName);
       localStorage.setItem("gemini_sales_voice", voiceName);
       localStorage.setItem("gemini_sales_remember", "true");
     } else {
       localStorage.removeItem("gemini_sales_api_key");
       localStorage.removeItem("lk_url");
+      localStorage.removeItem("lk_token");
       localStorage.removeItem("lk_key");
       localStorage.removeItem("lk_secret");
+      localStorage.removeItem("lk_auth_mode");
       localStorage.removeItem("gemini_sales_product");
       localStorage.removeItem("gemini_sales_voice");
       localStorage.setItem("gemini_sales_remember", "false");
@@ -291,9 +337,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // 1. Generate LiveKit token using our utility
-      const roomName = "sales-room-" + Math.floor(Math.random() * 10000);
-      const token = await generateLiveKitToken(lkKey, lkSecret, roomName, "customer");
+      // 1. Get LiveKit token (pasted directly or auto-generated)
+      let token = "";
+      if (currentAuthMode === "token") {
+        token = lkToken;
+      } else {
+        const roomName = "sales-room-" + Math.floor(Math.random() * 10000);
+        token = await generateLiveKitToken(lkKey, lkSecret, roomName, "customer");
+      }
       
       // 2. Initialize Room
       room = new Room({
@@ -394,14 +445,33 @@ document.addEventListener("DOMContentLoaded", () => {
     btnStartCall.addEventListener("click", async () => {
       geminiKey = inputGeminiKey.value.trim();
       lkUrl = inputLivekitUrl.value.trim();
-      lkKey = inputLivekitKey.value.trim();
-      lkSecret = inputLivekitSecret.value.trim();
       productName = inputProduct.value.trim();
 
-      if (!geminiKey || !lkUrl || !lkKey || !lkSecret) {
-        if (errorText) errorText.innerText = "Please input valid configuration.";
+      if (!geminiKey) {
+        if (errorText) errorText.innerText = "Please input a valid Gemini API Key.";
         transitionTo("error");
         return;
+      }
+      if (!lkUrl) {
+        if (errorText) errorText.innerText = "Please input a valid LiveKit WebSocket URL.";
+        transitionTo("error");
+        return;
+      }
+      if (currentAuthMode === "token") {
+        const tokenVal = inputLivekitToken.value.trim();
+        if (!tokenVal) {
+          if (errorText) errorText.innerText = "Please input a valid LiveKit Connection Token.";
+          transitionTo("error");
+          return;
+        }
+      } else {
+        const keyVal = inputLivekitKey.value.trim();
+        const secretVal = inputLivekitSecret.value.trim();
+        if (!keyVal || !secretVal) {
+          if (errorText) errorText.innerText = "Please input a valid LiveKit API Key and Secret.";
+          transitionTo("error");
+          return;
+        }
       }
       if (!productName) {
         if (errorText) errorText.innerText = "Please input a product to sell.";

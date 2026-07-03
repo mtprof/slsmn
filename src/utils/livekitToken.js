@@ -1,4 +1,4 @@
-import { SignJWT } from 'jose';
+import { SignJWT } from 'https://esm.sh/jose';
 
 export async function generateLiveKitToken(apiKey, apiSecret, roomName, participantName) {
   const secret = new TextEncoder().encode(apiSecret);
