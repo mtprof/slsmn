@@ -675,13 +675,20 @@ Follow this metacognitive sales methodology:
 
       socket.onerror = (e) => {
         console.error("Websocket connection exception", e);
-        if (errorText) errorText.innerText = "Connection failed. Please ensure your Gemini key is fully active and not rate-limited.";
+        if (errorText) errorText.innerText = "Connection failed. Please ensure your Gemini key is fully active and correct.";
         transitionTo("error");
         terminateSession();
       };
 
-      socket.onclose = () => {
-        if (callStatus !== "closed" && callStatus !== "error") {
+      socket.onclose = (event) => {
+        if (callStatus === "connecting") {
+          console.error("Websocket closed during handshake/connection phase", event);
+          if (errorText) {
+            errorText.innerText = `Connection closed immediately by server (Close Code: ${event.code || 'unknown'}). This usually indicates an invalid, expired, or rate-limited Gemini API Key, or that the selected Gemini Live API model is currently unavailable in your region.`;
+          }
+          transitionTo("error");
+          terminateSession();
+        } else if (callStatus !== "closed" && callStatus !== "error") {
           transitionTo("idle");
           terminateSession();
         }
@@ -742,6 +749,9 @@ Follow this metacognitive sales methodology:
 
         micStream = stream;
         inputAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (inputAudioCtx.state === "suspended") {
+          await inputAudioCtx.resume();
+        }
         const source = inputAudioCtx.createMediaStreamSource(stream);
         processorNode = inputAudioCtx.createScriptProcessor(2048, 1, 1);
 
@@ -797,7 +807,8 @@ Follow this metacognitive sales methodology:
       } catch (micErr) {
         console.error("Microphone or playout permission request failed in click context", micErr);
         if (errorText) {
-          errorText.innerText = "Could not access microphone. Ensure that you have allowed microphone permissions for this app in your browser settings.";
+          const errMsg = micErr.message || micErr.name || String(micErr);
+          errorText.innerText = `Could not access microphone (${errMsg}). Please verify that a microphone is plugged in, and that you have granted microphone access to this application in your browser settings.`;
         }
         transitionTo("error");
         terminateSession();
