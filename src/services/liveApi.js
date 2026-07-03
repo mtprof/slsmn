@@ -208,10 +208,10 @@ Follow this metacognitive sales methodology:
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({
         realtimeInput: {
-          mediaChunks: [{
+          audio: {
             mimeType: "audio/pcm;rate=16000",
             data: base64Audio
-          }]
+          }
         }
       }));
     }
