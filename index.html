@@ -14,8 +14,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Link compiled Tailwind CSS v4 styles -->
-    <link rel="stylesheet" href="/src/index.css">
+    <!-- Tailwind CSS Play CDN for instant, zero-build compilation on GitHub Pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+              display: ['Space Grotesk', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
     
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -363,7 +377,7 @@
     </footer>
 
     <!-- Native JavaScript Implementation -->
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
     <script>
       // Initialize lucide icons on load
       document.addEventListener("DOMContentLoaded", () => {
