@@ -42,14 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- State Managers ---
   let apiKey = localStorage.getItem("gemini_sales_api_key") || "";
   let productName = localStorage.getItem("gemini_sales_product") || "Porsche 911";
-  let modelName = localStorage.getItem("gemini_sales_model") || "models/gemini-3.1-flash-live-preview";
+  let modelName = "models/gemini-2.0-flash-exp";
   let voiceName = localStorage.getItem("gemini_sales_voice") || "Puck";
   let rememberSettings = localStorage.getItem("gemini_sales_remember") !== "false";
 
   // Pre-fill fields
   if (inputApiKey) inputApiKey.value = apiKey;
   if (inputProduct) inputProduct.value = productName;
-  if (selectModel) selectModel.value = modelName;
   if (selectVoice) selectVoice.value = voiceName;
   if (checkboxRemember) checkboxRemember.checked = rememberSettings;
 
@@ -500,7 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
     apiKey = inputApiKey.value.trim();
     productName = inputProduct.value.trim();
     voiceName = selectVoice ? selectVoice.value : "Puck";
-    modelName = selectModel ? selectModel.value : "models/gemini-3.1-flash-live-preview";
+    modelName = "models/gemini-2.0-flash-exp";
     rememberSettings = checkboxRemember ? checkboxRemember.checked : true;
 
     // Save configurations
@@ -508,13 +507,11 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("gemini_sales_api_key", apiKey);
       localStorage.setItem("gemini_sales_product", productName);
       localStorage.setItem("gemini_sales_voice", voiceName);
-      localStorage.setItem("gemini_sales_model", modelName);
       localStorage.setItem("gemini_sales_remember", "true");
     } else {
       localStorage.removeItem("gemini_sales_api_key");
       localStorage.removeItem("gemini_sales_product");
       localStorage.removeItem("gemini_sales_voice");
-      localStorage.removeItem("gemini_sales_model");
       localStorage.setItem("gemini_sales_remember", "false");
     }
 
@@ -771,6 +768,11 @@ Follow this metacognitive sales methodology:
             if (scheduledNodes.length > 0) {
               clearSalesmanAudioQueue();
             }
+          } else {
+            if (activeSpeaker === "customer") {
+              activeSpeaker = "none";
+              updateActiveSpeakerUI();
+            }
           }
 
           // Downsample and stream pcm chunks to WebSocket only when active
@@ -781,7 +783,7 @@ Follow this metacognitive sales methodology:
             socket.send(JSON.stringify({
               realtimeInput: {
                 mediaChunks: [{
-                  mimeType: "audio/pcm",
+                  mimeType: "audio/pcm;rate=16000",
                   data: base64Audio
                 }]
               }
