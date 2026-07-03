@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const screenClosed = document.getElementById("screen-closed");
 
   // Inputs
+  const inputGeminiKey = document.getElementById("input-gemini-key");
   const inputLivekitUrl = document.getElementById("input-livekit-url");
   const inputLivekitKey = document.getElementById("input-livekit-key");
   const inputLivekitSecret = document.getElementById("input-livekit-secret");
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvasActive = document.getElementById("canvas-active");
 
   // --- State Managers ---
+  let geminiKey = localStorage.getItem("gemini_sales_api_key") || "";
   let lkUrl = localStorage.getItem("lk_url") || "";
   let lkKey = localStorage.getItem("lk_key") || "";
   let lkSecret = localStorage.getItem("lk_secret") || "";
@@ -51,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let rememberSettings = localStorage.getItem("gemini_sales_remember") !== "false";
 
   // Pre-fill fields
+  if (inputGeminiKey) inputGeminiKey.value = geminiKey;
   if (inputLivekitUrl) inputLivekitUrl.value = lkUrl;
   if (inputLivekitKey) inputLivekitKey.value = lkKey;
   if (inputLivekitSecret) inputLivekitSecret.value = lkSecret;
@@ -252,6 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Connect to Service ---
   async function initializeSession() {
+    geminiKey = inputGeminiKey.value.trim();
     lkUrl = inputLivekitUrl.value.trim();
     lkKey = inputLivekitKey.value.trim();
     lkSecret = inputLivekitSecret.value.trim();
@@ -261,6 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Persist settings if requested
     if (rememberSettings) {
+      localStorage.setItem("gemini_sales_api_key", geminiKey);
       localStorage.setItem("lk_url", lkUrl);
       localStorage.setItem("lk_key", lkKey);
       localStorage.setItem("lk_secret", lkSecret);
@@ -268,6 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("gemini_sales_voice", voiceName);
       localStorage.setItem("gemini_sales_remember", "true");
     } else {
+      localStorage.removeItem("gemini_sales_api_key");
       localStorage.removeItem("lk_url");
       localStorage.removeItem("lk_key");
       localStorage.removeItem("lk_secret");
@@ -386,13 +392,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Bind Action Event Listeners ---
   if (btnStartCall) {
     btnStartCall.addEventListener("click", async () => {
+      geminiKey = inputGeminiKey.value.trim();
       lkUrl = inputLivekitUrl.value.trim();
       lkKey = inputLivekitKey.value.trim();
       lkSecret = inputLivekitSecret.value.trim();
       productName = inputProduct.value.trim();
 
-      if (!lkUrl || !lkKey || !lkSecret) {
-        if (errorText) errorText.innerText = "Please input valid LiveKit configuration.";
+      if (!geminiKey || !lkUrl || !lkKey || !lkSecret) {
+        if (errorText) errorText.innerText = "Please input valid configuration.";
         transitionTo("error");
         return;
       }
