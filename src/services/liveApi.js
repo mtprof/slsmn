@@ -123,6 +123,9 @@ Follow this metacognitive sales methodology:
           let rawData = event.data;
           if (rawData instanceof Blob) {
             rawData = await rawData.text();
+          } else if (rawData instanceof ArrayBuffer) {
+            const decoder = new TextDecoder('utf-8');
+            rawData = decoder.decode(rawData);
           }
           const response = JSON.parse(rawData);
 
