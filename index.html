@@ -81,18 +81,46 @@
         </div>
 
         <div class="space-y-5">
-          <!-- Field 1: API Key -->
+          
+          <!-- Field 1: LiveKit URL -->
           <div>
-            <label for="input-api-key" class="block text-[9px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
-              Gemini API Key
+            <label for="input-livekit-url" class="block text-[9px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
+              LiveKit WebSocket URL
             </label>
             <input
-              id="input-api-key"
-              type="password"
-              placeholder="Paste AIzaSy Key"
+              id="input-livekit-url"
+              type="text"
+              placeholder="wss://your-project.livekit.cloud"
               class="w-full px-4 py-3 bg-neutral-900/40 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 focus:outline-none text-white placeholder-neutral-700 text-xs rounded-lg transition-all font-mono"
             />
           </div>
+          
+          <!-- Field 2: LiveKit API Key -->
+          <div>
+            <label for="input-livekit-key" class="block text-[9px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
+              LiveKit API Key
+            </label>
+            <input
+              id="input-livekit-key"
+              type="text"
+              placeholder="devkey"
+              class="w-full px-4 py-3 bg-neutral-900/40 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 focus:outline-none text-white placeholder-neutral-700 text-xs rounded-lg transition-all font-mono"
+            />
+          </div>
+          
+          <!-- Field 3: LiveKit API Secret -->
+          <div>
+            <label for="input-livekit-secret" class="block text-[9px] font-mono uppercase tracking-widest text-neutral-400 mb-2">
+              LiveKit API Secret
+            </label>
+            <input
+              id="input-livekit-secret"
+              type="password"
+              placeholder="secret"
+              class="w-full px-4 py-3 bg-neutral-900/40 border border-neutral-900 hover:border-neutral-800 focus:border-neutral-700 focus:outline-none text-white placeholder-neutral-700 text-xs rounded-lg transition-all font-mono"
+            />
+          </div>
+
 
           <!-- Field 2: Product Name -->
           <div>
@@ -278,48 +306,11 @@
       Bi-Directional Audio Stream &bull; Client-Side WebSocket Link
     </footer>
 
-    <!-- Debug Log Container for troubleshooting -->
-    <div class="fixed bottom-0 left-0 w-full max-h-48 overflow-y-auto bg-black/90 border-t border-neutral-800 p-3 z-50 text-left font-mono text-[10px] text-neutral-400 hidden" id="debug-log-container">
-      <div class="flex justify-between items-center mb-2 pb-1 border-b border-neutral-800">
-        <span class="text-neutral-200 font-bold uppercase tracking-widest">System Logs</span>
-        <button id="btn-close-logs" class="text-neutral-500 hover:text-white uppercase tracking-widest px-2 cursor-pointer">Close</button>
-      </div>
-      <div id="debug-logs" class="space-y-1 whitespace-pre-wrap"></div>
-    </div>
-    
     <!-- Native JavaScript Implementation -->
     <script type="module" src="./src/main.js?v=5"></script>
     <script>
-      // Quick global logger interceptor
-      const originalConsoleLog = console.log;
-      const originalConsoleError = console.error;
-      const originalConsoleWarn = console.warn;
-      const logToUI = (level, ...args) => {
-        const container = document.getElementById("debug-log-container");
-        const logArea = document.getElementById("debug-logs");
-        if (container && logArea) {
-          container.classList.remove("hidden");
-          const div = document.createElement("div");
-          const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
-          div.innerText = `[${new Date().toISOString().split('T')[1].slice(0,-1)}] [${level}] ${msg}`;
-          if (level === 'ERROR') div.className = 'text-red-400';
-          if (level === 'WARN') div.className = 'text-yellow-400';
-          logArea.appendChild(div);
-          container.scrollTop = container.scrollHeight;
-        }
-      };
-      console.log = (...args) => { logToUI('INFO', ...args); originalConsoleLog(...args); };
-      console.error = (...args) => { logToUI('ERROR', ...args); originalConsoleError(...args); };
-      console.warn = (...args) => { logToUI('WARN', ...args); originalConsoleWarn(...args); };
-      
       // Initialize lucide icons on load
       document.addEventListener("DOMContentLoaded", () => {
-        const btnCloseLogs = document.getElementById("btn-close-logs");
-        if(btnCloseLogs) {
-          btnCloseLogs.addEventListener("click", () => {
-            document.getElementById("debug-log-container").classList.add("hidden");
-          });
-        }
         if (window.lucide) {
           window.lucide.createIcons();
         }

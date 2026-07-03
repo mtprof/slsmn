@@ -1,4 +1,5 @@
-// Modern Vanilla JS Controller for the AI Salesman Live Prototype
+with open('src/main.js', 'w') as f:
+    f.write("""// Modern Vanilla JS Controller for the AI Salesman Live Prototype
 import { drawVisualizer } from "./utils/visualizer.js?v=5";
 import { generateLiveKitToken } from "./utils/livekitToken.js";
 import { Room, RoomEvent, createLocalAudioTrack, Track } from "livekit-client";
@@ -430,3 +431,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+""")

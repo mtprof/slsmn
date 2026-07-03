@@ -1,0 +1,20 @@
+import { SignJWT } from 'jose';
+
+export async function generateLiveKitToken(apiKey, apiSecret, roomName, participantName) {
+  const secret = new TextEncoder().encode(apiSecret);
+  
+  const token = await new SignJWT({
+    video: {
+      room: roomName,
+      roomJoin: true
+    }
+  })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setIssuer(apiKey)
+    .setSubject(participantName)
+    .setExpirationTime('2h')
+    .sign(secret);
+    
+  return token;
+}
