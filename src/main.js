@@ -343,7 +343,15 @@ document.addEventListener("DOMContentLoaded", () => {
         token = lkToken;
       } else {
         const roomName = "sales-room-" + Math.floor(Math.random() * 10000);
-        token = await generateLiveKitToken(lkKey, lkSecret, roomName, "customer");
+        const metadataPayload = JSON.stringify({
+          gemini_api_key: geminiKey,
+          apiKey: geminiKey,
+          product: productName,
+          voice: voiceName,
+          voice_name: voiceName,
+          voiceName: voiceName
+        });
+        token = await generateLiveKitToken(lkKey, lkSecret, roomName, "customer", metadataPayload);
       }
       
       // 2. Initialize Room
