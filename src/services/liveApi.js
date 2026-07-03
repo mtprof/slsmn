@@ -206,14 +206,23 @@ Follow this metacognitive sales methodology:
    */
   sendAudioChunk(base64Audio) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({
-        realtimeInput: {
-          audio: {
-            mimeType: "audio/pcm;rate=16000",
-            data: base64Audio
-          }
+      const payload = {
+        clientContent: {
+          turns: [
+            {
+              role: "user",
+              parts: [{
+                inlineData: {
+                  mimeType: "audio/pcm;rate=16000",
+                  data: base64Audio
+                }
+              }]
+            }
+          ],
+          turnComplete: false
         }
-      }));
+      };
+      this.socket.send(JSON.stringify(payload));
     }
   }
 

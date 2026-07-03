@@ -17,23 +17,6 @@
     <!-- Link compiled Tailwind CSS v4 styles -->
     <link rel="stylesheet" href="./src/index.css">
     
-    <!-- Tailwind CSS Play CDN (Fallback) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              display: ['Space Grotesk', 'sans-serif'],
-              mono: ['JetBrains Mono', 'monospace'],
-            }
-          }
-        }
-      }
-    </script>
-    
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -305,7 +288,7 @@
     </div>
     
     <!-- Native JavaScript Implementation -->
-    <script type="module" src="./src/main.js"></script>
+    <script type="module" src="./src/main.js?v=5"></script>
     <script>
       // Quick global logger interceptor
       const originalConsoleLog = console.log;

@@ -1,9 +1,9 @@
 // Modern Vanilla JS Controller for the AI Salesman Live Prototype
 // Cleanly modularized and split into smaller, maintainable modules
 
-import { downsampleAndPCMEncode, arrayBufferToBase64 } from "./utils/audio.js";
-import { drawVisualizer } from "./utils/visualizer.js";
-import { GeminiLiveSession } from "./services/liveApi.js";
+import { downsampleAndPCMEncode, arrayBufferToBase64 } from "./utils/audio.js?v=5";
+import { drawVisualizer } from "./utils/visualizer.js?v=5";
+import { GeminiLiveSession } from "./services/liveApi.js?v=5";
 
 document.addEventListener("DOMContentLoaded", () => {
   // --- UI Elements ---
