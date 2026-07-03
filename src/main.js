@@ -248,8 +248,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const rms = Math.sqrt(sumSquares / pcm16.length);
       volumesState.salesmanVolume = Math.max(volumesState.salesmanVolume, rms);
       if (rms > 0.005) {
-        activeSpeaker = "salesman";
-        updateActiveSpeakerUI();
+        if (activeSpeaker !== "salesman") {
+          activeSpeaker = "salesman";
+          updateActiveSpeakerUI();
+        }
       }
 
       const audioBuffer = outputAudioCtx.createBuffer(1, float32.length, 24000);
@@ -496,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
           await inputAudioCtx.resume();
         }
         const source = inputAudioCtx.createMediaStreamSource(stream);
-        processorNode = inputAudioCtx.createScriptProcessor(2048, 1, 1);
+        processorNode = inputAudioCtx.createScriptProcessor(4096, 1, 1);
 
         source.connect(processorNode);
         processorNode.connect(inputAudioCtx.destination);
@@ -516,8 +518,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // User interruption check
           if (rms > 0.012) {
-            activeSpeaker = "customer";
-            updateActiveSpeakerUI();
+            if (activeSpeaker !== "customer") {
+              activeSpeaker = "customer";
+              updateActiveSpeakerUI();
+            }
             if (scheduledNodes.length > 0) {
               clearSalesmanAudioQueue();
             }

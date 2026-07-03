@@ -120,7 +120,11 @@ Follow this metacognitive sales methodology:
 
       this.socket.onmessage = async (event) => {
         try {
-          const response = JSON.parse(event.data);
+          let rawData = event.data;
+          if (rawData instanceof Blob) {
+            rawData = await rawData.text();
+          }
+          const response = JSON.parse(rawData);
 
           // A: Handshake completion
           if (response.setupComplete) {

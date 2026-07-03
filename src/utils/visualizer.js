@@ -76,25 +76,16 @@ export function drawVisualizer(canvas, time, callStatus, activeSpeaker, state) {
   ctx.lineWidth = 2.5;
   if (callStatus === "connecting") {
     ctx.strokeStyle = "rgba(217, 119, 6, 0.8)";
-    ctx.shadowColor = "rgba(217, 119, 6, 0.3)";
-    ctx.shadowBlur = 10;
   } else {
     if (activeSpeaker === "customer") {
       ctx.strokeStyle = "rgba(14, 165, 233, 0.9)";
-      ctx.shadowColor = "rgba(14, 165, 233, 0.4)";
-      ctx.shadowBlur = 12;
     } else if (activeSpeaker === "salesman") {
       ctx.strokeStyle = "rgba(16, 185, 129, 0.9)";
-      ctx.shadowColor = "rgba(16, 185, 129, 0.4)";
-      ctx.shadowBlur = 15;
     } else {
       ctx.strokeStyle = "rgba(99, 102, 241, 0.4)";
-      ctx.shadowColor = "rgba(99, 102, 241, 0.1)";
-      ctx.shadowBlur = 5;
     }
   }
   ctx.stroke();
-  ctx.shadowBlur = 0; // reset
 
   // Center hub circle
   ctx.beginPath();
