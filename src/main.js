@@ -1,7 +1,7 @@
 // Modern Vanilla JS Controller for the AI Salesman Live Prototype
-import { drawVisualizer } from "./utils/visualizer.js?v=5";
+import { drawVisualizer } from "./utils/visualizer.js";
 import { generateLiveKitToken } from "./utils/livekitToken.js";
-import { Room, RoomEvent, createLocalAudioTrack, Track } from "https://esm.sh/livekit-client";
+import { Room, RoomEvent, createLocalAudioTrack, Track } from "livekit-client";
 
 document.addEventListener("DOMContentLoaded", () => {
   // --- UI Elements ---

@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Link compiled Tailwind CSS v4 styles -->
-    <link rel="stylesheet" href="./src/index.css">
+    <link rel="stylesheet" href="/src/index.css">
     
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -195,6 +195,19 @@
             </select>
           </div>
 
+          <!-- Remember credentials checkbox -->
+          <div class="flex items-center gap-2.5 pt-1">
+            <input
+              id="checkbox-remember"
+              type="checkbox"
+              class="w-3.5 h-3.5 accent-white rounded border-neutral-900 bg-neutral-900/40 text-white focus:ring-0 cursor-pointer"
+              checked
+            />
+            <label for="checkbox-remember" class="text-[9px] font-mono text-neutral-400 uppercase tracking-widest cursor-pointer select-none">
+              Remember Credentials
+            </label>
+          </div>
+
           <!-- Connect button -->
           <button
             id="btn-start-call"
@@ -350,7 +363,7 @@
     </footer>
 
     <!-- Native JavaScript Implementation -->
-    <script type="module" src="./src/main.js?v=5"></script>
+    <script type="module" src="/src/main.js"></script>
     <script>
       // Initialize lucide icons on load
       document.addEventListener("DOMContentLoaded", () => {
